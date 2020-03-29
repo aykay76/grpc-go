@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+package environment;
+
+service EnvironmentService {
+    rpc GetEnvironmentVariable(KeyValuePair) returns (KeyValuePair) {}
+
+    rpc SetEnvironmentVariable(KeyValuePair) returns (google.protobuf.Empty) {}
+
+    rpc GetEnvironmentVariables(google.protobuf.Empty) returns (stream KeyValuePair) {}
+}
+
+message KeyValuePair {
+    string key = 1;
+    string value = 2;
+}
