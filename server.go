@@ -4,18 +4,11 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"log"
-	"net"
 	"os"
 	"strings"
 
-	empty "github.com/golang/protobuf/ptypes/empty"
-	"google.golang.org/grpc"
-
-	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/testdata"
-
 	pb "github.com/aykay76/grpc-go/environment"
+	empty "github.com/golang/protobuf/ptypes/empty"
 )
 
 var (
