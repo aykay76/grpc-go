@@ -13,10 +13,18 @@ import (
 )
 
 var (
-	tls      = flag.Bool("tls", false, "Connection uses TLS if true, else plain TCP")
+	server = flag.Bool("server", true, "Set to true if acting as a server, false if acting as a client")
+	tls    = flag.Bool("tls", false, "Connection uses TLS if true, else plain TCP")
+
+	// server variables
 	certFile = flag.String("cert_file", "", "The TLS cert file")
 	keyFile  = flag.String("key_file", "", "The TLS key file")
 	port     = flag.Int("port", 10000, "The server port")
+
+	// client variables
+	caFile             = flag.String("ca_file", "", "The file containing the CA root cert file")
+	serverAddr         = flag.String("server_addr", "localhost:10000", "The server address in the format of host:port")
+	serverHostOverride = flag.String("server_host_override", "x.test.youtube.com", "The server name use to verify the hostname returned by TLS handshake")
 )
 
 func main() {
@@ -39,7 +47,12 @@ func main() {
 		}
 		opts = []grpc.ServerOption{grpc.Creds(creds)}
 	}
-	grpcServer := grpc.NewServer(opts...)
-	pb.RegisterEnvironmentServiceServer(grpcServer, newServer())
-	grpcServer.Serve(lis)
+
+	if *server {
+		grpcServer := grpc.NewServer(opts...)
+		pb.RegisterEnvironmentServiceServer(grpcServer, newServer())
+		grpcServer.Serve(lis)
+	} else {
+		newClient()
+	}
 }
