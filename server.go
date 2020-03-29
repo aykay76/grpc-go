@@ -2,21 +2,12 @@ package main
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"os"
 	"strings"
 
 	pb "github.com/aykay76/grpc-go/environment"
 	empty "github.com/golang/protobuf/ptypes/empty"
-)
-
-var (
-	tls        = flag.Bool("tls", false, "Connection uses TLS if true, else plain TCP")
-	certFile   = flag.String("cert_file", "", "The TLS cert file")
-	keyFile    = flag.String("key_file", "", "The TLS key file")
-	jsonDBFile = flag.String("json_db_file", "", "A json file containing a list of features")
-	port       = flag.Int("port", 10000, "The server port")
 )
 
 type environmentServer struct {
@@ -48,8 +39,9 @@ func (server *environmentServer) GetEnvironmentVariables(req *empty.Empty, strea
 	return nil
 }
 
-func (server *environmentServer) SetEnvironmentVariable(ctx context.Context, kvp pb.KeyValuePair) {
+func (server *environmentServer) SetEnvironmentVariable(ctx context.Context, kvp *pb.KeyValuePair) (*empty.Empty, error) {
 	os.Setenv(kvp.Key, kvp.Value)
+	return nil, nil
 }
 
 func newServer() *environmentServer {
