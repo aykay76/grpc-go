@@ -12,8 +12,6 @@ import (
 	"google.golang.org/grpc/testdata"
 )
 
-var ()
-
 func newClient() {
 	var opts []grpc.DialOption
 	if *tls {
