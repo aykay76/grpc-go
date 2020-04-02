@@ -10,11 +10,13 @@ import (
 	empty "github.com/golang/protobuf/ptypes/empty"
 )
 
-type environmentServer struct {
+// EnvironmentServer : server for the environment service
+type EnvironmentServer struct {
 	pb.UnimplementedEnvironmentServiceServer
 }
 
-func (server *environmentServer) GetEnvironmentVariable(ctx context.Context, kvp *pb.KeyValuePair) (*pb.KeyValuePair, error) {
+// GetEnvironmentVariable : allow clients to get specified environment variable
+func (server *EnvironmentServer) GetEnvironmentVariable(ctx context.Context, kvp *pb.KeyValuePair) (*pb.KeyValuePair, error) {
 	var result pb.KeyValuePair
 	result.Key = kvp.Key
 	result.Value = os.Getenv(kvp.Key)
@@ -22,7 +24,8 @@ func (server *environmentServer) GetEnvironmentVariable(ctx context.Context, kvp
 	return &result, nil
 }
 
-func (server *environmentServer) GetEnvironmentVariables(req *empty.Empty, stream pb.EnvironmentService_GetEnvironmentVariablesServer) error {
+// GetEnvironmentVariables : allows clients to get all environment variables on a stream
+func (server *EnvironmentServer) GetEnvironmentVariables(req *empty.Empty, stream pb.EnvironmentService_GetEnvironmentVariablesServer) error {
 	for _, e := range os.Environ() {
 		pair := strings.SplitN(e, "=", 2)
 		fmt.Println(pair[0])
@@ -39,12 +42,8 @@ func (server *environmentServer) GetEnvironmentVariables(req *empty.Empty, strea
 	return nil
 }
 
-func (server *environmentServer) SetEnvironmentVariable(ctx context.Context, kvp *pb.KeyValuePair) (*empty.Empty, error) {
+// SetEnvironmentVariable : allows clients to set environment variables
+func (server *EnvironmentServer) SetEnvironmentVariable(ctx context.Context, kvp *pb.KeyValuePair) (*empty.Empty, error) {
 	os.Setenv(kvp.Key, kvp.Value)
 	return nil, nil
-}
-
-func newServer() *environmentServer {
-	s := &environmentServer{}
-	return s
 }

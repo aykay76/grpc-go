@@ -7,12 +7,14 @@ import (
 	"time"
 
 	pb "github.com/aykay76/grpc-go/environment"
+	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/testdata"
 )
 
-func newClient() {
+// NewClient : creates a new client :o
+func NewClient() {
 	var opts []grpc.DialOption
 	if *tls {
 		if *caFile == "" {
@@ -39,7 +41,7 @@ func newClient() {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	stream, err := client.GetEnvironmentVariables(ctx, nil)
+	stream, err := client.GetEnvironmentVariables(ctx, &empty.Empty{})
 	if err != nil {
 		log.Fatalf("%v.GetEnvironmentVariables(_) = _, %v", client, err)
 	}

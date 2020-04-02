@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	server = flag.Bool("server", true, "Set to true if acting as a server, false if acting as a client")
+	server = flag.Bool("server", false, "Set to true if acting as a server, false if acting as a client")
 	tls    = flag.Bool("tls", false, "Connection uses TLS if true, else plain TCP")
 
 	// server variables
@@ -29,10 +29,6 @@ var (
 
 func main() {
 	flag.Parse()
-	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", *port))
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
 	var opts []grpc.ServerOption
 	if *tls {
 		if *certFile == "" {
@@ -49,10 +45,15 @@ func main() {
 	}
 
 	if *server {
+		lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", *port))
+		if err != nil {
+			log.Fatalf("failed to listen: %v", err)
+		}
+
 		grpcServer := grpc.NewServer(opts...)
-		pb.RegisterEnvironmentServiceServer(grpcServer, newServer())
+		pb.RegisterEnvironmentServiceServer(grpcServer, &EnvironmentServer{})
 		grpcServer.Serve(lis)
 	} else {
-		newClient()
+		NewClient()
 	}
 }
