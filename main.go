@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/http"
 
 	pb "github.com/aykay76/grpc-go/environment"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/testdata"
@@ -30,6 +32,7 @@ var (
 func main() {
 	flag.Parse()
 	var opts []grpc.ServerOption
+
 	if *tls {
 		if *certFile == "" {
 			*certFile = testdata.Path("server1.pem")
@@ -49,9 +52,23 @@ func main() {
 		if err != nil {
 			log.Fatalf("failed to listen: %v", err)
 		}
+		defer lis.Close()
 
 		grpcServer := grpc.NewServer(opts...)
 		pb.RegisterEnvironmentServiceServer(grpcServer, &EnvironmentServer{})
+
+		fmt.Println("Serving /metrics for Prometheus...")
+		// run the http server for Prometheus scraping in the background
+		go func() {
+			http.Handle("/metrics", promhttp.Handler())
+			// TODO: make the port configurable
+			http.ListenAndServe(":9093", nil)
+			if err != nil {
+				fmt.Println("Could not initiate metrics")
+			}
+		}()
+
+		fmt.Printf("Serving GRPC listener on port %d...\n", *port)
 		grpcServer.Serve(lis)
 	} else {
 		NewClient()

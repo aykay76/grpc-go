@@ -8,6 +8,16 @@ import (
 
 	pb "github.com/aykay76/grpc-go/environment"
 	empty "github.com/golang/protobuf/ptypes/empty"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
+)
+
+var (
+	opsProcessed = promauto.NewCounter(prometheus.CounterOpts{
+		Name: "grpc_server_operations_total",
+		Help: "The total number of processed operations",
+	})
 )
 
 // EnvironmentServer : server for the environment service
@@ -17,6 +27,8 @@ type EnvironmentServer struct {
 
 // GetEnvironmentVariable : allow clients to get specified environment variable
 func (server *EnvironmentServer) GetEnvironmentVariable(ctx context.Context, kvp *pb.KeyValuePair) (*pb.KeyValuePair, error) {
+	opsProcessed.Inc()
+
 	var result pb.KeyValuePair
 	result.Key = kvp.Key
 	result.Value = os.Getenv(kvp.Key)
@@ -26,6 +38,8 @@ func (server *EnvironmentServer) GetEnvironmentVariable(ctx context.Context, kvp
 
 // GetEnvironmentVariables : allows clients to get all environment variables on a stream
 func (server *EnvironmentServer) GetEnvironmentVariables(req *empty.Empty, stream pb.EnvironmentService_GetEnvironmentVariablesServer) error {
+	opsProcessed.Inc()
+
 	for _, e := range os.Environ() {
 		pair := strings.SplitN(e, "=", 2)
 		fmt.Println(pair[0])
@@ -44,6 +58,8 @@ func (server *EnvironmentServer) GetEnvironmentVariables(req *empty.Empty, strea
 
 // SetEnvironmentVariable : allows clients to set environment variables
 func (server *EnvironmentServer) SetEnvironmentVariable(ctx context.Context, kvp *pb.KeyValuePair) (*empty.Empty, error) {
+	opsProcessed.Inc()
+
 	os.Setenv(kvp.Key, kvp.Value)
 	return nil, nil
 }
