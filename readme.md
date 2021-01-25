@@ -8,4 +8,9 @@ Make sure server is listening on 0.0.0.0 NOT localhost so that it works in conta
 
 ## To build the image
 
-docker build .
+`docker build . --tag localhost:5000/grpc-go`
+`docker push localhost:5000/grpc-go`
+
+## To run the image
+
+`docker run --rm --name grpc-go --publish 10000:10000 localhost:5000/grpc-go`
