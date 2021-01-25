@@ -13,6 +13,8 @@ WORKDIR /
 
 COPY --from=builder /build .
 
+EXPOSE 10000
+
 # Command to run the executable
 CMD ["/service", "-server=true"]
 
