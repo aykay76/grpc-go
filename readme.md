@@ -14,3 +14,7 @@ Make sure server is listening on 0.0.0.0 NOT localhost so that it works in conta
 ## To run the image
 
 `docker run --rm --name grpc-go --publish 10000:10000 localhost:5000/grpc-go`
+
+## TODO
+
+- Convert for k8s and create service for registry
