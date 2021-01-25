@@ -14,5 +14,5 @@ WORKDIR /
 COPY --from=builder /build .
 
 # Command to run the executable
-CMD ["/service"]
+CMD ["/service", "-server=true"]
 
